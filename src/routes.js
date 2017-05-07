@@ -1,13 +1,73 @@
 import Home from './components/Home.vue'
-import User from './components/user/User.vue'
+import Header from './components/Header.vue'
+
+ const User = resolve => {
+  require.ensure(['./components/user/User.vue'], () => {
+    resolve(require('./components/user/User.vue'))
+  }, 'user')
+}
+
+const UserStart = resolve => {
+  require.ensure(['./components/user/UserStart.vue'], () => {
+    resolve(require('./components/user/UserStart.vue'))
+  }, 'user')
+}
+
+const UserDetail = resolve => {
+  require.ensure(['./components/user/UserDetail.vue'], () => {
+    resolve(require('./components/user/UserDetail.vue'))
+  }, 'user')
+}
+
+const UserEdit = resolve => {
+  require.ensure(['./components/user/UserEdit.vue'], () => {
+    resolve(require('./components/user/UserEdit.vue'))
+  }, 'user')
+} 
+
+function requireAuth (to, from, next) {
+  console.log('inside route setup')
+  next()
+}
 
 export const routes = [
   {
     path: '',
-    component: Home
+    name: 'home',
+    components: {
+      default: Home,
+      'header-top': Header
+    }
   },
   {
     path: '/user',
-    component: User
+    components: {
+      default: User,
+      'header-bottom': Header
+    },
+    children: [
+      {
+        path: '',
+        component: UserStart
+      },
+      {
+        path: ':id',
+        component: UserDetail
+      },
+      {
+        path: ':id/edit',
+        name: 'userEdit',
+        component: UserEdit,
+        beforeEnter: requireAuth
+      }
+    ]
+  },
+  {
+    path: '/redirect-me',
+    redirect: { name: 'home' }
+  },
+  {
+    path: '*',
+    redirect: { name: 'home' }
   }
 ]
